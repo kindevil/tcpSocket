@@ -58,7 +58,7 @@ func (s *Socket) Handle(tcpServer *TcpServer, session *Session) {
 				return
 			}
 		} else {
-			logger.Debug("receive heaetbeat packet form ", session.Conn.RemoteAddr().String())
+			logger.Debug("receive heaetbeat packet form", session.Conn.RemoteAddr().String())
 		}
 	}
 }
