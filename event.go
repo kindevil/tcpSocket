@@ -9,7 +9,7 @@ import (
 type events interface {
 	OnHandel(id string, conn net.Conn) bool
 	OnClose(session *Session)
-	OnMessage(session *Session, packetType int16, message []byte) bool
+	OnMessage(tcpserver *TcpServer, session *Session, packetType int16, message []byte) bool
 }
 
 type DefaultEvents struct {
@@ -24,9 +24,10 @@ func (d *DefaultEvents) OnClose(session *Session) {
 	logger.Info(session.Id, "clinet closed.")
 }
 
-func (d *DefaultEvents) OnMessage(session *Session, packetType int16, message []byte) bool {
-	logger.Info(packetType)
-	logger.Info(len(message))
+func (d *DefaultEvents) OnMessage(tcpserver *TcpServer, session *Session, packetType int16, message []byte) bool {
 	logger.Info(string(message[:]))
+	//msg := tcpserver.SocketType.Pack(message)
+
+	tcpserver.SessionMap.WriteTo(session.Id, message)
 	return true
 }

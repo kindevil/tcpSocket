@@ -55,7 +55,7 @@ func (s *Socket) Handle(tcpServer *TcpServer, session *Session) {
 
 		packetType := s.BytesToInt16(packetTypeByte)
 		if packetType != HEARTBEATPACKET {
-			if tcpServer.Event.OnMessage(session, packetType, data) == false {
+			if tcpServer.Event.OnMessage(tcpServer, session, packetType, data) == false {
 				return
 			}
 		} else {
