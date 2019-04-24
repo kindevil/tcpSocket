@@ -80,7 +80,10 @@ func (s *SessionMap) RemoveSession(id string) {
 }
 
 func (s *SessionMap) Broadcast(message []byte) {
-	message = s.server.SocketType.Pack(message)
+	message, err := s.server.SocketType.Pack(message)
+	if err != nil {
+		return
+	}
 	s.sessions.Range(func(key, value interface{}) bool {
 		if value, ok := value.(*Session); ok {
 			if err := value.write(string(message)); err != nil {
@@ -93,7 +96,10 @@ func (s *SessionMap) Broadcast(message []byte) {
 }
 
 func (s *SessionMap) WriteTo(id string, message []byte) bool {
-	message = s.server.SocketType.Pack(message)
+	message, err := s.server.SocketType.Pack(message)
+	if err != nil {
+		return false
+	}
 	value, ok := s.sessions.Load(id)
 	if ok {
 		if session, ok := value.(*Session); ok {
