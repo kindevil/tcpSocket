@@ -12,8 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kindevil/newcontrol/clinet"
-	tcp "github.com/kindevil/newcontrol/socket"
+	tcp "github.com/kindevil/tcpSocket"
 	"github.com/wonderivan/logger"
 )
 
