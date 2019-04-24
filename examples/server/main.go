@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/kindevil/newcontrol/socket"
+	"github.com/kindevil/tcpSocket"
 )
 
 func main() {
