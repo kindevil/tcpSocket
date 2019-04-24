@@ -26,6 +26,17 @@ type TcpClinet struct {
 	Conn    net.Conn
 }
 
+type SocketPacket struct {
+	Header     int16
+	PacketType int16
+	Length     int32
+	Content    []byte
+}
+
+type HeartBeat struct {
+	Counter int
+}
+
 func main() {
 	clinet := NewClinet("127.0.0.1:9000")
 	clinet.Start()
@@ -77,10 +88,6 @@ func (t *TcpClinet) Start() {
 	}
 }
 
-type HeartBeat struct {
-	Counter int
-}
-
 func (t *TcpClinet) heartbeat() {
 	counter := 1
 	for {
@@ -107,6 +114,7 @@ func (t *TcpClinet) read() {
 	buffer := make([]byte, 0)
 	readBuffer := make([]byte, 512)
 	data := make([]byte, 20)
+	packetType := int16(0)
 
 	for {
 		l, err := t.Conn.Read(readBuffer)
@@ -115,7 +123,7 @@ func (t *TcpClinet) read() {
 		}
 
 		buffer = append(buffer, readBuffer[:l]...)
-		buffer, data, err = t.Depack(buffer)
+		buffer, data, packetType, err = t.Unpack(buffer)
 		if err != nil {
 			logger.Error(err)
 			return
@@ -125,62 +133,60 @@ func (t *TcpClinet) read() {
 			continue
 		}
 
+		if packetType != HEARTBEATPACKET {
+			// do something
+		}
+
 		logger.Info(string(data))
 	}
 }
 
-func (t *TcpClinet) Depack(buffer []byte) ([]byte, []byte, error) {
+func (s *TcpClinet) Unpack(buffer []byte) ([]byte, []byte, int16, error) {
 	length := len(buffer)
 
 	if length < 8 {
-		return buffer, nil, nil
+		return buffer, nil, 0, nil
 	}
 
-	if t.BytesToInt16(buffer[:2]) != HEADER {
-		return []byte{}, nil, errors.New("header is illegal")
+	header := int16(0)
+	binary.Read(bytes.NewReader(buffer[0:2]), binary.BigEndian, &header)
+	if header != HEADER {
+		return []byte{}, nil, 0, errors.New("header is illegal")
 	}
 
-	messageLength := t.BytesToInt(buffer[4:8])
-	if length < 8+messageLength {
-		return buffer, nil, nil
+	messageLength := int32(0)
+	binary.Read(bytes.NewReader(buffer[4:8]), binary.BigEndian, &messageLength)
+	if length < 8+int(messageLength) {
+		return buffer, nil, 0, nil
 	}
+
+	packetType := int16(0)
+	binary.Read(bytes.NewReader(buffer[2:4]), binary.BigEndian, &packetType)
 
 	data := buffer[8 : messageLength+8]
 	tbuffer := buffer[messageLength+8:]
-	return tbuffer, data, nil
+	return tbuffer, data, packetType, nil
 }
 
-func (t *TcpClinet) Pack(message []byte, packetType int16) []byte {
-	header := t.Int16ToBytes(HEADER)
-	packetTypeByte := t.Int16ToBytes(packetType)
-	length := t.Int32ToBytes(len(message))
-	return append(append(append(header, packetTypeByte...), length...), message...)
-}
+func (s *TcpClinet) Pack(message []byte, packetType int16) []byte {
+	socketPacket := &SocketPacket{
+		Header:     HEADER,
+		PacketType: packetType,
+		Length:     int32(len(message)),
+		Content:    message,
+	}
 
-func (t *TcpClinet) Int16ToBytes(n int16) []byte {
-	x := int16(n)
-	bytesBuffer := bytes.NewBuffer([]byte{})
-	binary.Write(bytesBuffer, binary.BigEndian, x)
-	return bytesBuffer.Bytes()
-}
+	buffer := new(bytes.Buffer)
+	var err error
 
-func (t *TcpClinet) Int32ToBytes(n int) []byte {
-	x := int32(n)
-	bytesBuffer := bytes.NewBuffer([]byte{})
-	binary.Write(bytesBuffer, binary.BigEndian, x)
-	return bytesBuffer.Bytes()
-}
+	err = binary.Write(buffer, binary.BigEndian, &socketPacket.Header)
+	err = binary.Write(buffer, binary.BigEndian, &socketPacket.PacketType)
+	err = binary.Write(buffer, binary.BigEndian, &socketPacket.Length)
+	err = binary.Write(buffer, binary.BigEndian, &socketPacket.Content)
 
-func (t *TcpClinet) BytesToInt16(b []byte) int16 {
-	bytesBuffer := bytes.NewBuffer(b)
-	var x int16
-	binary.Read(bytesBuffer, binary.BigEndian, &x)
-	return x
-}
+	if err != nil {
+		logger.Error(err)
+	}
 
-func (t *TcpClinet) BytesToInt(b []byte) int {
-	bytesBuffer := bytes.NewBuffer(b)
-	var x int32
-	binary.Read(bytesBuffer, binary.BigEndian, &x)
-	return int(x)
+	return buffer.Bytes()
 }
