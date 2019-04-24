@@ -12,7 +12,6 @@ import (
 	"strings"
 	"time"
 
-	tcp "github.com/kindevil/tcpSocket"
 	"github.com/wonderivan/logger"
 )
 
@@ -137,7 +136,7 @@ func (t *TcpClinet) Depack(buffer []byte) ([]byte, []byte, error) {
 		return buffer, nil, nil
 	}
 
-	if t.BytesToInt16(buffer[:2]) != tcp.HEADER {
+	if t.BytesToInt16(buffer[:2]) != HEADER {
 		return []byte{}, nil, errors.New("header is illegal")
 	}
 
