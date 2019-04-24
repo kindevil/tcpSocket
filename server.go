@@ -8,7 +8,7 @@ import (
 
 type SocketTypes interface {
 	Handle(tcpServer *TcpServer, session *Session)
-	Pack(data []byte) []byte
+	Pack(message []byte) []byte
 }
 
 type TcpServer struct {
