@@ -31,7 +31,7 @@ func (s *Socket) Handle(tcpServer *TcpServer, session *Session) {
 	}()
 
 	buffer := make([]byte, 0)
-	readBuffer := make([]byte, 512)
+	readBuffer := make([]byte, 1024)
 	data := make([]byte, 20)
 	packetTypeByte := make([]byte, 4)
 
