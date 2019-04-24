@@ -5,6 +5,6 @@ import (
 )
 
 func main() {
-	var server = socket.NewServer(&socket.Socket{})
+	var server = tcpSocket.NewServer(&tcpSocket.Socket{})
 	server.Start(":9000")
 }
