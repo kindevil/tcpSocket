@@ -75,9 +75,6 @@ func (s *Socket) Pack(message []byte) ([]byte, error) {
 	var err error
 
 	err = binary.Write(buffer, binary.BigEndian, &socketPacket.Header)
-
-	logger.Info(string(buffer.Bytes()))
-
 	err = binary.Write(buffer, binary.BigEndian, &socketPacket.PacketType)
 	err = binary.Write(buffer, binary.BigEndian, &socketPacket.Length)
 	err = binary.Write(buffer, binary.BigEndian, &socketPacket.Content)
@@ -110,32 +107,4 @@ func (s *Socket) Unpack(buffer []byte) ([]byte, []byte, int16, error) {
 	data := buffer[8 : messageLength+8]
 	tbuffer := buffer[messageLength+8:]
 	return tbuffer, data, packetType, nil
-}
-
-func (s *Socket) BytesToInt16(b []byte) int16 {
-	bytesBuffer := bytes.NewBuffer(b)
-	var x int16
-	binary.Read(bytesBuffer, binary.BigEndian, &x)
-	return x
-}
-
-func (s *Socket) BytesToInt(b []byte) int {
-	bytesBuffer := bytes.NewBuffer(b)
-	var x int32
-	binary.Read(bytesBuffer, binary.BigEndian, &x)
-	return int(x)
-}
-
-func (s *Socket) Int16ToBytes(n int16) []byte {
-	x := int16(n)
-	bytesBuffer := bytes.NewBuffer([]byte{})
-	binary.Write(bytesBuffer, binary.BigEndian, x)
-	return bytesBuffer.Bytes()
-}
-
-func (s *Socket) Int32ToBytes(n int) []byte {
-	x := int32(n)
-	bytesBuffer := bytes.NewBuffer([]byte{})
-	binary.Write(bytesBuffer, binary.BigEndian, x)
-	return bytesBuffer.Bytes()
 }
