@@ -26,8 +26,6 @@ func (d *DefaultEvents) OnClose(session *Session) {
 
 func (d *DefaultEvents) OnMessage(tcpserver *TcpServer, session *Session, packetType int16, message []byte) bool {
 	logger.Info(string(message[:]))
-	//msg := tcpserver.SocketType.Pack(message)
-
 	tcpserver.SessionMap.WriteTo(session.Id, message)
 	return true
 }
