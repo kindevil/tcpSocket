@@ -58,6 +58,8 @@ func (s *Socket) Handle(tcpServer *TcpServer, session *Session) {
 			if tcpServer.Event.OnMessage(session, packetType, data) == false {
 				return
 			}
+		} else {
+			logger.Debug("receive heaetbeat packet form ", session.Conn.RemoteAddr().String())
 		}
 	}
 }
