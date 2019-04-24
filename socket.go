@@ -37,7 +37,7 @@ func (s *Socket) Handle(tcpServer *TcpServer, session *Session) {
 
 	for {
 		l, err := session.Conn.Read(readBuffer)
-		session.updateTime()
+		session.UpdateTime()
 		if err != nil {
 			return
 		}

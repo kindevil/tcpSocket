@@ -34,7 +34,7 @@ func (s *Session) close() {
 	s.Conn.Close()
 }
 
-func (s *Session) updateTime() {
+func (s *Session) UpdateTime() {
 	s.times = time.Now().Unix()
 }
 
