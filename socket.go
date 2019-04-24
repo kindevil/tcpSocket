@@ -10,7 +10,8 @@ import (
 
 const (
 	HEADER          int16 = 1028
-	HeartBeatPacket int16 = 1000
+	HEARTBEATPACKET int16 = 1000
+	REQUESTPACKET   int16 = 1001
 )
 
 type Socket struct {
@@ -61,7 +62,7 @@ func (s *Socket) Handle(tcpServer *TcpServer, session *Session) {
 
 func (s *Socket) Pack(message []byte) []byte {
 	header := s.Int16ToBytes(HEADER)
-	packetType := s.Int16ToBytes(HeartBeatPacket)
+	packetType := s.Int16ToBytes(REQUESTPACKET)
 	length := s.Int32ToBytes(len(message))
 	return append(append(append(header, packetType...), length...), message...)
 }
