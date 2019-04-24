@@ -28,7 +28,7 @@ type TcpClinet struct {
 }
 
 func main() {
-	clinet := clinet.NewClinet("127.0.0.1:9000")
+	clinet := NewClinet("127.0.0.1:9000")
 	clinet.Start()
 }
 
