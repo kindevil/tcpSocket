@@ -7,12 +7,17 @@ import (
 )
 
 type events interface {
+	AfterStart(tcpserver *TcpServer, address string)
 	OnHandel(id string, conn net.Conn) bool
 	OnClose(session *Session)
 	OnMessage(tcpserver *TcpServer, session *Session, packetType int16, message []byte) bool
 }
 
 type DefaultEvents struct {
+}
+
+func (d *DefaultEvents) AfterStart(tcpserver *TcpServer, address string) {
+	logger.Info("server listening on", address)
 }
 
 func (d *DefaultEvents) OnHandel(id string, conn net.Conn) bool {
