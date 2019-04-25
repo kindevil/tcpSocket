@@ -39,6 +39,8 @@ func (t *TcpServer) Start(address string) {
 		panic(err)
 	}
 
+	t.Event.AfterStart(t, address)
+
 	go t.SessionMap.HeartBeat(t.HeartBeatTime)
 
 	for {
