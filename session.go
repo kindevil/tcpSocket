@@ -130,3 +130,12 @@ func (s *SessionMap) HeartBeat(num int64) {
 		}
 	}
 }
+
+func (s *SessionMap) Total() int {
+	total := 0
+	s.sessions.Range(func(key, value interface{}) bool {
+		total++
+		return true
+	})
+	return total
+}
