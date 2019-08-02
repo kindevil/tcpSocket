@@ -12,16 +12,18 @@ type SocketTypes interface {
 }
 
 type TcpServer struct {
-	SessionMap    *SessionMap
-	SocketType    SocketTypes
-	Event         events
-	HeartBeatTime int64
+	SessionMap    	*SessionMap
+	SocketType    	SocketTypes
+	Event         	events
+	EnableHeartBeat	bool
+	HeartBeatTime 	int64
 }
 
 func NewServer(socketType SocketTypes) *TcpServer {
 	tcpServer := &TcpServer{
-		SocketType:    socketType,
-		HeartBeatTime: 6,
+		SocketType:    	socketType,
+		EnableHeartBeat:false,	
+		HeartBeatTime: 	6,
 	}
 	tcpServer.SessionMap = NewSessionMap(tcpServer)
 
@@ -41,7 +43,9 @@ func (t *TcpServer) Start(address string) {
 
 	t.Event.AfterStart(t, address)
 
-	go t.SessionMap.HeartBeat(t.HeartBeatTime)
+	if t.EnableHeartBeat {
+		go t.SessionMap.HeartBeat(t.HeartBeatTime)
+	}
 
 	for {
 		conn, err := listen.Accept()
@@ -66,5 +70,6 @@ func (t *TcpServer) RegisterEvent(event events) {
 }
 
 func (t *TcpServer) SetHeartBeat(time int64) {
+	t.EnableHeartBeat = true
 	t.HeartBeatTime = time
 }
